@@ -54,7 +54,10 @@ module.exports = ({ inputSchema, outputSchema, ajvOptions }) => {
       const valid = validateInput(handler.event)
 
       if (!valid) {
-        const error = new createError.BadRequest('Event object failed validation')
+        // Planks two line change to make this a fancy json error response
+        let errors = JSON.stringify({success:false, errors: validateInput.errors.map(error => error.message)}, null, 2)
+        const error = new createError.BadRequest(errors)
+        
         handler.event.headers = Object.assign({}, handler.event.headers)
         const language = chooseLanguage(handler.event, options.defaultLanguage)
         ajvLocalize[language](validateInput.errors)
